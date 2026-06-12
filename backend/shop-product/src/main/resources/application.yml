@@ -15,6 +15,8 @@ spring:
     redis:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:16380}
+  messages:
+    basename: i18n/messages
 
 dubbo:
   application:
@@ -30,6 +32,17 @@ mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
     log-impl: ${MBP_LOG_IMPL:org.apache.ibatis.logging.stdout.StdOutImpl}
+
+knife4j:
+  enable: true
+
+shop:
+  minio:
+    endpoint: ${MINIO_ENDPOINT:http://localhost:19000}
+    access-key: ${MINIO_ROOT_USER:shopadmin}
+    secret-key: ${MINIO_ROOT_PASSWORD:shopadmin123}
+    bucket: ${MINIO_BUCKET:shop-images}
+    public-endpoint: ${MINIO_PUBLIC_ENDPOINT:http://localhost:19000}
 
 logging:
   level:

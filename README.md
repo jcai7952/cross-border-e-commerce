@@ -15,7 +15,7 @@
   - `shop-logistics` :9605 — 运费模板 / 物流轨迹 / 清关
 - **mall-web/** :5183 — 买家商城（Vue3 + Vite + Pinia + vue-i18n）
 - **admin-web/** :5184 — 管理后台（Vue3 + Element Plus + ECharts）
-- **shop-uniapp/** :5185(H5) — 移动端（uni-app Vue3，可编译微信小程序）
+- **shop_app/** — 移动端（Flutter / Dart，Android & iOS；开发期 Flutter Web :5185 验证）
 
 ## 基础设施（docker/）
 

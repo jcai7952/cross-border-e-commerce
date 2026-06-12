@@ -6,10 +6,24 @@ spring:
     name: shop-gateway
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:dev}
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:16380}
   cloud:
     gateway:
       server:
         webflux:
+          globalcors:
+            cors-configurations:
+              '[/**]':
+                allowed-origin-patterns:
+                  - "http://localhost:*"
+                  - "http://127.0.0.1:*"
+                allowed-methods: "*"
+                allowed-headers: "*"
+                allow-credentials: true
+                max-age: 3600
           routes:
             - id: user
               uri: ${USER_SERVICE_URI:http://localhost:9601}
@@ -31,6 +45,13 @@ spring:
               uri: ${LOGISTICS_SERVICE_URI:http://localhost:9605}
               predicates:
                 - Path=/api/logistics/**,/api/admin/logistics/**
+
+# 与 shop-user 共享同一套会话（同 Redis、同 token 配置）
+sa-token:
+  token-name: satoken
+  timeout: 604800
+  is-print: false
+  is-log: false
 
 logging:
   level:
