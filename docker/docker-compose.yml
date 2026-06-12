@@ -1,0 +1,63 @@
+name: kinnshop
+
+services:
+  shop-mysql:
+    image: mysql:8.0.39
+    container_name: shop-mysql
+    restart: unless-stopped
+    ports:
+      - "13307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-123456}
+      TZ: Asia/Shanghai
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-time-zone=+08:00
+    volumes:
+      - ./init:/docker-entrypoint-initdb.d:ro
+      - ./data/mysql:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${MYSQL_ROOT_PASSWORD:-123456}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  shop-redis:
+    image: redis:7.2
+    container_name: shop-redis
+    restart: unless-stopped
+    ports:
+      - "16380:6379"
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - ./data/redis:/data
+
+  shop-nacos:
+    image: nacos/nacos-server:v2.3.2
+    container_name: shop-nacos
+    restart: unless-stopped
+    ports:
+      # 宿主机 8950 -> 容器 8848（HTTP），9950 -> 9848（gRPC）。
+      # 客户端按「HTTP 端口 +1000」推导 gRPC 端口，两个映射必须保持 1000 偏移。
+      - "8950:8848"
+      - "9950:9848"
+    environment:
+      MODE: standalone
+      NACOS_AUTH_ENABLE: "false"
+      JVM_XMS: 256m
+      JVM_XMX: 512m
+
+  shop-minio:
+    image: minio/minio:RELEASE.2024-08-17T01-24-54Z
+    container_name: shop-minio
+    restart: unless-stopped
+    ports:
+      - "19000:9000"
+      - "19001:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-shopadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-shopadmin123}
+    command: server /data --console-address ":9001"
+    volumes:
+      - ./data/minio:/data

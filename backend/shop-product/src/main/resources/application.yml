@@ -1,0 +1,36 @@
+server:
+  port: 9602
+
+spring:
+  application:
+    name: shop-product
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:13307}/shop_product?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:123456}
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:16380}
+
+dubbo:
+  application:
+    name: shop-product
+    qos-enable: false
+  protocol:
+    name: dubbo
+    port: 20882
+  registry:
+    address: nacos://${NACOS_HOST:localhost}:${NACOS_PORT:8950}
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: ${MBP_LOG_IMPL:org.apache.ibatis.logging.stdout.StdOutImpl}
+
+logging:
+  level:
+    com.kinn.shop: info

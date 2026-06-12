@@ -1,0 +1,37 @@
+server:
+  port: 9600
+
+spring:
+  application:
+    name: shop-gateway
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            - id: user
+              uri: ${USER_SERVICE_URI:http://localhost:9601}
+              predicates:
+                - Path=/api/user/**,/api/auth/**,/api/address/**,/api/identity/**,/api/admin/auth/**,/api/admin/user/**
+            - id: product
+              uri: ${PRODUCT_SERVICE_URI:http://localhost:9602}
+              predicates:
+                - Path=/api/product/**,/api/category/**,/api/currency/**,/api/review/**,/api/favorite/**,/api/flash-sale/**,/api/file/**,/api/admin/product/**,/api/admin/category/**,/api/admin/currency/**,/api/admin/review/**,/api/admin/flash-sale/**
+            - id: order
+              uri: ${ORDER_SERVICE_URI:http://localhost:9603}
+              predicates:
+                - Path=/api/cart/**,/api/order/**,/api/coupon/**,/api/checkout/**,/api/admin/order/**,/api/admin/coupon/**
+            - id: payment
+              uri: ${PAYMENT_SERVICE_URI:http://localhost:9604}
+              predicates:
+                - Path=/api/pay/**,/api/admin/pay/**
+            - id: logistics
+              uri: ${LOGISTICS_SERVICE_URI:http://localhost:9605}
+              predicates:
+                - Path=/api/logistics/**,/api/admin/logistics/**
+
+logging:
+  level:
+    org.springframework.cloud.gateway: info

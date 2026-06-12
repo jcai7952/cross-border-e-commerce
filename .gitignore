@@ -1,0 +1,40 @@
+# ---- Java / Maven ----
+target/
+*.class
+*.jar
+!.mvn/wrapper/maven-wrapper.jar
+*.war
+*.log
+
+# ---- Node / 前端 ----
+node_modules/
+dist/
+.vite/
+*.local
+
+# ---- uni-app ----
+unpackage/
+
+# ---- IDE ----
+.idea/
+*.iml
+.vscode/
+*.swp
+
+# ---- 环境与密钥（生产规范：密钥不入库） ----
+.env
+.env.*
+!.env.example
+application-secret.yml
+
+# ---- 运行时产物 ----
+upload/
+logs/
+docker/data/
+
+# ---- OS ----
+Thumbs.db
+.DS_Store
+
+# Claude 本地配置
+.claude/
