@@ -15,6 +15,8 @@ spring:
     redis:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:16380}
+  messages:
+    basename: i18n/messages
 
 dubbo:
   application:
@@ -30,6 +32,9 @@ mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
     log-impl: ${MBP_LOG_IMPL:org.apache.ibatis.logging.stdout.StdOutImpl}
+
+knife4j:
+  enable: true
 
 logging:
   level:
