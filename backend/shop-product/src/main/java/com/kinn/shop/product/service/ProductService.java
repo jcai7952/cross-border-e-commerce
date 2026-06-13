@@ -28,10 +28,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
- * 前台商品：分页搜索 / 详情 / 当前闪购。
+ * 前台商品：分页搜索 / 详情 / 当前闪购 / 规则推荐 / 全站热销。
  */
 @Slf4j
 @Service
@@ -184,6 +187,58 @@ public class ProductService {
             log.warn("[product] size chart json parse failed, categoryId={}", categoryId);
             return null;
         }
+    }
+
+    /** 规则推荐：同叶子类目在售按销量降序（排除自身），不足用全站热销补足（去重）。 */
+    public List<ProductListVO> recommend(Long productId, String locale, String currency, Integer limit) {
+        int lim = clampLimit(limit, 8);
+        PriceService.CurrencyCtx ctx = priceService.resolve(currency);
+        String loc = Locales.normalize(locale);
+
+        List<Product> result = new ArrayList<>();
+        Set<Long> excluded = new HashSet<>();
+        excluded.add(productId);
+        Product self = productMapper.selectById(productId);
+        if (self != null && self.getCategoryId() != null) {
+            productMapper.selectList(Wrappers.<Product>lambdaQuery()
+                            .eq(Product::getStatus, 1)
+                            .eq(Product::getCategoryId, self.getCategoryId())
+                            .ne(Product::getId, productId)
+                            .orderByDesc(Product::getSalesCount)
+                            .orderByDesc(Product::getId)
+                            .last("LIMIT " + lim))
+                    .forEach(p -> {
+                        result.add(p);
+                        excluded.add(p.getId());
+                    });
+        }
+        if (result.size() < lim) {
+            result.addAll(productMapper.selectList(Wrappers.<Product>lambdaQuery()
+                    .eq(Product::getStatus, 1)
+                    .notIn(Product::getId, excluded)
+                    .orderByDesc(Product::getSalesCount)
+                    .orderByDesc(Product::getId)
+                    .last("LIMIT " + (lim - result.size()))));
+        }
+        return assembler.toListVOs(result, loc, ctx);
+    }
+
+    /** 全站热销：在售按销量降序。 */
+    public List<ProductListVO> bestSellers(String locale, String currency, Integer limit) {
+        int lim = clampLimit(limit, 10);
+        PriceService.CurrencyCtx ctx = priceService.resolve(currency);
+        String loc = Locales.normalize(locale);
+        List<Product> products = productMapper.selectList(Wrappers.<Product>lambdaQuery()
+                .eq(Product::getStatus, 1)
+                .orderByDesc(Product::getSalesCount)
+                .orderByDesc(Product::getId)
+                .last("LIMIT " + lim));
+        return assembler.toListVOs(products, loc, ctx);
+    }
+
+    private static int clampLimit(Integer limit, int def) {
+        int v = limit == null ? def : limit;
+        return Math.min(Math.max(v, 1), 50);
     }
 
     /** 进行中的闪购（无则 null）。 */

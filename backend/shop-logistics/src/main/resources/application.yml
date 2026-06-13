@@ -15,6 +15,8 @@ spring:
     redis:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:16380}
+  messages:
+    basename: i18n/messages
 
 dubbo:
   application:
@@ -30,6 +32,14 @@ mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
     log-impl: ${MBP_LOG_IMPL:org.apache.ibatis.logging.stdout.StdOutImpl}
+
+knife4j:
+  enable: true
+
+shop:
+  logistics:
+    # 轨迹推进 Job 间隔（毫秒），演示时调小可加速整链路履约
+    advance-interval-ms: 30000
 
 logging:
   level:
