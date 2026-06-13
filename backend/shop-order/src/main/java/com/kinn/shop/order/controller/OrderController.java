@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class OrderController {
 
     private final OrderService orderService;
+    private final com.kinn.shop.order.service.OrderActionService orderActionService;
 
     @Operation(summary = "下单（服务端全量重算金额，锁定汇率，30 分钟支付时限）")
     @PostMapping("/create")
@@ -55,6 +56,13 @@ public class OrderController {
     @PostMapping("/{orderNo}/cancel")
     public Result<Void> cancel(@PathVariable String orderNo) {
         orderService.cancel(orderNo);
+        return Result.ok();
+    }
+
+    @Operation(summary = "确认收货（SHIPPED→FINISHED）")
+    @PostMapping("/{orderNo}/confirm")
+    public Result<Void> confirm(@PathVariable String orderNo) {
+        orderActionService.confirm(orderNo);
         return Result.ok();
     }
 }

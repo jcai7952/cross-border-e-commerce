@@ -1,0 +1,33 @@
+package com.kinn.shop.payment.entity;
+
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.kinn.shop.common.mybatis.BaseEntity;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+import java.time.LocalDateTime;
+
+/**
+ * 本地消息表（最终一致性：支付成功通知订单服务失败时落表，Job 重试兜底）。
+ */
+@Data
+@EqualsAndHashCode(callSuper = true)
+@TableName("local_message")
+public class LocalMessage extends BaseEntity {
+
+    private static final long serialVersionUID = 1L;
+
+    /** ORDER_MARK_PAID 等 */
+    private String bizType;
+
+    private String bizKey;
+
+    private String payload;
+
+    /** 0待投递 1成功 2死信 */
+    private Integer status;
+
+    private Integer retryCount;
+
+    private LocalDateTime nextRetryTime;
+}

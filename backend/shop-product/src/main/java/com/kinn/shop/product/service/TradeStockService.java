@@ -3,8 +3,10 @@ package com.kinn.shop.product.service;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.kinn.shop.api.product.dto.StockOpDTO;
 import com.kinn.shop.product.entity.FlashSaleItem;
+import com.kinn.shop.product.entity.Product;
 import com.kinn.shop.product.entity.ProductSku;
 import com.kinn.shop.product.mapper.FlashSaleItemMapper;
+import com.kinn.shop.product.mapper.ProductMapper;
 import com.kinn.shop.product.mapper.ProductSkuMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,7 @@ import java.util.Map;
 public class TradeStockService {
 
     private final ProductSkuMapper productSkuMapper;
+    private final ProductMapper productMapper;
     private final FlashSaleItemMapper flashSaleItemMapper;
     private final FlashSaleService flashSaleService;
 
@@ -71,6 +74,20 @@ public class TradeStockService {
                             .eq(FlashSaleItem::getProductId, productId)
                             .setSql("sold = IF(sold >= {0}, sold - {0}, 0)", qty)));
         }
+    }
+
+    /** 支付成功后累计销量（按 productId 聚合；幂等由调用方保证）。 */
+    @Transactional(rollbackFor = Exception.class)
+    public void addSales(List<StockOpDTO> ops) {
+        Map<Long, Integer> qty = new LinkedHashMap<>();
+        for (StockOpDTO op : ops) {
+            if (op != null && op.getProductId() != null && op.getQuantity() > 0) {
+                qty.merge(op.getProductId(), op.getQuantity(), Integer::sum);
+            }
+        }
+        qty.forEach((productId, q) -> productMapper.update(null, Wrappers.<Product>lambdaUpdate()
+                .eq(Product::getId, productId)
+                .setSql("sales_count = sales_count + {0}", q)));
     }
 
     /** 按命中闪购的 productId 聚合数量（同一商品多 SKU 合并一次更新）。 */

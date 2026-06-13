@@ -24,6 +24,8 @@ public class SaTokenConfig {
             "/api/flash-sale/**",
             "/api/review/list",
             "/api/pay/notify/**",
+            "/api/pay/simulator/**",
+            "/api/pay/paypal/return/**",
             "/favicon.ico"
     };
 

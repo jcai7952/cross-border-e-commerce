@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminOrderController {
 
     private final AdminOrderService adminOrderService;
+    private final com.kinn.shop.order.service.OrderActionService orderActionService;
 
     @Operation(summary = "全量订单分页（金额 USD 分，含明细摘要）")
     @GetMapping("/page")
@@ -35,5 +36,12 @@ public class AdminOrderController {
     @GetMapping("/{orderNo}")
     public Result<AdminOrderDetailVO> detail(@PathVariable String orderNo) {
         return Result.ok(adminOrderService.detail(orderNo));
+    }
+
+    @Operation(summary = "发货（PAID→SHIPPED，物流建单并启动轨迹模拟）")
+    @org.springframework.web.bind.annotation.PostMapping("/{orderNo}/ship")
+    public Result<java.util.Map<String, String>> ship(@PathVariable String orderNo) {
+        String shipmentNo = orderActionService.ship(orderNo);
+        return Result.ok(java.util.Map.of("shipmentNo", shipmentNo));
     }
 }

@@ -169,6 +169,14 @@ public class ProductTradeFacadeImpl implements ProductTradeFacade {
     }
 
     @Override
+    public void addSales(List<StockOpDTO> ops) {
+        if (ops == null || ops.isEmpty()) {
+            return;
+        }
+        tradeStockService.addSales(ops);
+    }
+
+    @Override
     public RateDTO getRate(String currency) {
         if (currency == null || currency.isBlank()) {
             return null;

@@ -28,4 +28,7 @@ public interface ProductTradeFacade {
 
     /** 汇率与币种信息：currency=USD 返回 rate=1。不支持的币种返回 null。 */
     RateDTO getRate(String currency);
+
+    /** 支付成功后累计商品销量（按 productId 聚合，幂等性由调用方保证只调一次）。 */
+    void addSales(List<StockOpDTO> ops);
 }
